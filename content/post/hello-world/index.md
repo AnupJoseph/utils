@@ -5,9 +5,13 @@ slug: hello-world
 date: 2022-03-06 00:00:00+0000
 image: cover.jpg
 categories:
-    - Example Category
+    - Basics
+    - New Cats
 tags:
-    - Example Tag
+    - First Tag
+    - Second Tag
+    - trier
+    - Good tag
 ---
 
 Welcome to Hugo theme Stack. This is your first post. Edit or delete it, then start writing!
