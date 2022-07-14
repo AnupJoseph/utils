@@ -12,13 +12,13 @@ published = "July 10, 2022"
 lastUpdated = "July 10, 2022 15:04 IST"
 
 [sidebar]
-emoji = "🍥"
+emoji = "💭"
 subtitle = "A dump for a bunch of utility functions that I have gathered over the years"
 
 [sidebar.avatar]
 enabled = true
 local = true
-src = "img/avatar.png"
+src = "img/layered-steps-haikei.png"
 
 [article]
 math = false
