@@ -1,0 +1,139 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="A collection of shell tricks I have found useful over the years"><title>tricks.sh</title>
+<link rel=canonical href=https://anupjoseph.github.io/utils/p/tricks-sh/><link rel=stylesheet href=/utils/scss/style.min.8191399262444ab68b72a18c97392f5349be20a1615d77445be51e974c144cff.css><meta property="og:title" content="tricks.sh"><meta property="og:description" content="A collection of shell tricks I have found useful over the years"><meta property="og:url" content="https://anupjoseph.github.io/utils/p/tricks-sh/"><meta property="og:site_name" content="Utils"><meta property="og:type" content="article"><meta property="article:section" content="Post"><meta property="article:tag" content="sh"><meta name=twitter:title content="tricks.sh"><meta name=twitter:description content="A collection of shell tricks I have found useful over the years"></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/utils/><img src=/utils/img/layered-steps-haikei_huf0fa5221e5dfdf996616217748c8f861_1762_300x0_resize_box_3.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>💭</span></figure><div class=site-meta><h1 class=site-name><a href=/utils>Utils</a></h1><h2 class=site-description>A dump for a bunch of utility functions that I have gathered over the years</h2></div></header><ol class=social-menu><li><a href=https://github.com/AnupJoseph target=_blank title=GitHub rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://twitter.com/AnupJoseph8 target=_blank title=Twitter rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/utils/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/utils/archives/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/utils/search/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/utils/links/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><div class=menu-bottom-section><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></div></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#switch-to-previous-directory>Switch to previous directory</a><ol><li><a href=#git>git</a></li></ol></li></ol><ol><li><ol><li><a href=#cd>cd</a></li></ol></li><li><a href=#get-global-ip>Get global ip</a></li><li><a href=#simple-commands>Simple commands</a></li><li><a href=#loop>Loop</a></li><li><a href=#loop-with-specified-increment-each-iteration>Loop with specified increment each iteration</a></li><li><a href=#sequences-of-letters-or-numbers>Sequences of letters or numbers</a></li><li><a href=#reuse-arguments>Reuse arguments</a></li><li><a href=#reuse-commands>Reuse commands</a></li><li><a href=#compare-output-of-two-commands>Compare output of two commands</a></li><li><a href=#fix-last-command>Fix last command</a></li><li><a href=#accept-interactive-commands>Accept interactive commands</a></li><li><a href=#last-exit-code>Last exit code</a></li><li><a href=#easy-backup>Easy backup</a></li><li><a href=#print-to-stderr>Print to stderr</a></li><li><a href=#debugging>Debugging</a></li><li><a href=#useful-readline-tricks>Useful <code>readline</code> tricks</a></li><li><a href=#repeat-command>Repeat command</a></li><li><a href=#zipping-and-unzip>Zipping and Unzip</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/utils/categories/shell/>Shell</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/utils/p/tricks-sh/>tricks.sh</a></h2><h3 class=article-subtitle>A collection of shell tricks I have found useful over the years</h3></div><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>4 minute read</time></div></footer></div></header><section class=article-content><h1 id=table-of-contents>Table of Contents</h1><ol><li><a class=link href=#org4f2342b>Shell tricks</a><ol><li><a class=link href=#switch-to-previous-directory>Switch to previous directory</a><ol><li><a class=link href=#git>git</a></li></ol></li></ol></li><li><a class=link href=#org6b00f32>master</a>
+1. <a class=link href=#cd>cd</a><ol><li><a class=link href=#get-global-ip>Get global ip</a></li><li><a class=link href=#simple-commands>Simple commands</a></li><li><a class=link href=#loop>Loop</a></li><li><a class=link href=#loop-with-specified-increment-each-iteration>Loop with specified increment each iteration</a></li><li><a class=link href=#sequences-of-letters-or-numbers>Sequences of letters or numbers</a></li><li><a class=link href=#reuse-arguments>Reuse arguments</a></li><li><a class=link href=#reuse-commands>Reuse commands</a></li><li><a class=link href=#compare-output-of-two-commands>Compare output of two commands</a></li><li><a class=link href=#fix-last-command>Fix last command</a></li><li><a class=link href=#accept-interactive-commands>Accept interactive commands</a></li><li><a class=link href=#last-exit-code>Last exit code</a></li><li><a class=link href=#easy-backup>Easy backup</a></li><li><a class=link href=#print-to-stderr>Print to stderr</a></li><li><a class=link href=#debugging>Debugging</a></li><li><a class=link href=#useful-readline-tricks>Useful <code>readline</code> tricks</a></li><li><a class=link href=#repeat-command>Repeat command</a></li><li><a class=link href=#zipping-and-unzip>Zipping and Unzip</a></li></ol></li></ol><p></p><h1 id=shell-tricks>Shell tricks</h1><ul><li><a class=link href=#switch-to-previous-directory>Switch to previous directory</a><ul><li><a class=link href=#git>git</a></li><li><a class=link href=#cd>cd</a></li></ul></li><li><a class=link href=#get-global-ip>Get global ip</a></li><li><a class=link href=#simple-commands>Simple commands</a></li><li><a class=link href=#loop>Loop</a></li><li><a class=link href=#loop-with-specified-increment-each-iteration>Loop with specified increment each iteration</a></li><li><a class=link href=#sequences-of-letters-or-numbers>Sequences of letters or numbers</a></li><li><a class=link href=#reuse-arguments>Reuse arguments</a></li><li><a class=link href=#reuse-commands>Reuse commands</a></li><li><a class=link href=#compare-output-of-two-commands>Compare output of two commands</a></li><li><a class=link href=#fix-last-command>Fix last command</a></li><li><a class=link href=#accept-interactive-commands>Accept interactive commands</a></li><li><a class=link href=#last-exit-code>Last exit code</a></li><li><a class=link href=#easy-backup>Easy backup</a></li><li><a class=link href=#print-to-stderr>Print to stderr</a></li><li><a class=link href=#debugging>Debugging</a></li><li><a class=link href=#useful-readline-tricks>Useful <code>readline</code> tricks</a></li><li><a class=link href=#repeat-command>Repeat command</a></li><li><a class=link href=#zipping-and-unzip>Zipping and Unzip</a></li></ul><p></p><h2 id=switch-to-previous-directory>Switch to previous directory</h2><p>Switch between the current and previous branch / directory.</p><p></p><h3 id=git>git</h3><p>#+beginsrc sh
+$ git branch</p><p></p><h1 id=master>master</h1><p>development</p><p>$ git checkout development
+Switched to branch ’development’
+$ git checkout - # Switch to previous
+Switched to branch ’master’
+$ git checkout -
+Switched to branch ’development’
+#+endsrc</p><p></p><h3 id=cd>cd</h3><pre><code>$ pwd
+/
+$ cd /tmp
+$ cd - # Switch to previous
+/
+$ cd -
+/tmp
+</code></pre><p></p><h2 id=get-global-ip>Get global ip</h2><pre><code>$ curl ifconfig.co # IPv4
+50.110.14.21
+$ curl -6 ifconfig.co # IPv6
+2010:3f3f:113f:0:ea57:4497:7291:e422
+</code></pre><p></p><h2 id=simple-commands>Simple commands</h2><p>Create a script which calls functions by its` first argument. This is
+very useful to create simple scripts which could be a wrapper for other
+commands.</p><pre><code>#!/usr/bin/env bash
+
+function do_this () { echo &quot;call do_this function&quot;; }
+
+function do_sth() { echo &quot;call do_sth function&quot; }
+
+case &quot;$1&quot; in
+    do_this|do_sth) &quot;$1&quot; ;;
+esac
+</code></pre><p>Execute it:</p><pre><code>$ ./simple-commands.sh do_this
+call do_this function
+</code></pre><p></p><h2 id=loop>Loop</h2><p>Write simple one liner loops if you need to do some batch tasks.</p><pre><code>$ for i in {1..10}; do echo &quot;$i&quot;; done
+
+# List disk usage by directories
+$ for file in */ .*/ ; do du -sh $file; done
+</code></pre><p></p><h2 id=loop-with-specified-increment-each-iteration>Loop with specified increment each iteration</h2><pre><code>for i in {1..100..2}; do echo $i; done
+1
+3
+5
+7
+...
+</code></pre><p></p><h2 id=sequences-of-letters-or-numbers>Sequences of letters or numbers</h2><p>Brace expansion is great for lots of things.</p><pre><code>$ touch file{a..c}
+$ ls
+$ command ls
+filea fileb filec
+
+$ touch file-{1..15}
+$ ls
+file-1  file-10 file-11 file-12 file-13 file-14 file-15 file-2  file-3  file-4  file-5  file-6  file-7  file-8  file-9
+$ ls file-{9..12}
+file-10 file-11 file-12 file-9
+
+$ printf &quot;%s\n&quot; file-{a..c}{1..3}
+file-a1
+file-a2
+file-a3
+file-b1
+file-b2
+file-b3
+file-c1
+file-c2
+file-c3
+</code></pre><p>(If you give <code>printf</code> more arguments than it expects, it automatically
+loops.)</p><p></p><h2 id=reuse-arguments>Reuse arguments</h2><pre><code>$ ls /tmp
+some_file.txt some_archive.tar.gz
+$ cd !$
+/tmp
+</code></pre><p></p><h2 id=reuse-commands>Reuse commands</h2><pre><code>$ echo &quot;reuse me&quot;
+reuse me
+$ !!
+echo &quot;reuse me&quot;
+reuse me
+</code></pre><p></p><h2 id=compare-output-of-two-commands>Compare output of two commands</h2><pre><code>diff &lt;(echo &quot;1 2 4&quot;) &lt;(echo &quot;1 2 3 4&quot;)
+1c1
+&lt; 1 2 4
+---
+ &gt; 1 2 3 4
+</code></pre><p></p><h2 id=fix-last-command>Fix last command</h2><pre><code>$ ehco foo bar bar
+bash: ehco: command not found
+$ ^ehco^echo
+foo bar baz
+</code></pre><p></p><h2 id=accept-interactive-commands>Accept interactive commands</h2><pre><code>$ yes | ./interactive-command.sh
+Are you sure (y/n)
+Accepted
+yes: standard output: Broken pipe
+</code></pre><p>The error message is printed because <code>yes</code> gets killed by <code>SIGPIPE</code>
+signal. This happens if the pipe to <code>./interactive-command.sh</code> gets
+closed but <code>yes</code> still wants to write into it.</p><p>Ignore error message:</p><p><code>$ yes 2>/dev/null | ./interactive-command.sh</code></p><p></p><h2 id=last-exit-code>Last exit code</h2><pre><code>$ ls /tmp
+some_file.txt
+$ echo $?
+0
+</code></pre><p></p><h2 id=easy-backup>Easy backup</h2><pre><code>$ cp file.txt{,.bak}
+$ ls -1
+file.txt
+file.txt.bak
+</code></pre><p></p><h2 id=print-to-stderr>Print to stderr</h2><pre><code>$ &gt;&amp;2 echo hello
+hello
+</code></pre><p></p><h2 id=debugging>Debugging</h2><p>Add <code>-xv</code> to your bash scripts, i.e.:</p><pre><code>/usr/bin/env bash
+set -xv
+</code></pre><p>or <code>/bin/bash -xv script.sh</code></p><p></p><h2 id=useful-readline-tricks>Useful <code>readline</code> tricks</h2><p>If you use the standard <code>bash</code> <code>readline</code> bindings.</p><ul><li><code>C-a</code> (aka <code>CTRL+A</code>) move cursor to beginning of line</li><li><code>C-e</code> (aka <code>CTRL+E</code>) move cursor to end of line</li><li><code>M-.</code> (aka <code>ALT+.</code>) insert last argument of previous command (like
+<code>!$</code>, but you can edit it)</li></ul><p></p><h2 id=repeat-command>Repeat command</h2><p>Execute a command every two seconds and monitor its` output. This is
+especially useful for waiting until a deployment or infrastructure
+provisioning is completed, i.e. on aws.</p><p><code>watch -n2 echo hello</code> ` ## Substrings</p><pre><code>$ a=&quot;apple orange&quot;
+
+$ echo ${a#* }
+orange
+$ echo ${a#*p}
+ple orange
+$ echo ${a##*p}
+le orange
+
+$ echo ${a% *}
+apple
+$ echo ${a%p*}
+ap
+$ echo ${a%%p*}
+a
+</code></pre><p>The # for finding first occurence from the start and % for the first
+occurence from the end. * for matching any pattern. For greedy matching
+## and %%.</p><p></p><h2 id=zipping-and-unzip>Zipping and Unzip</h2><p>To zip a folder with certain file types excluded</p><pre><code>zip -x {file_types} -r archive.zip {folder}</code></pre></section><footer class=article-footer><section class=article-tags><a href=/utils/tags/sh/>sh</a></section><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><script src=https://utteranc.es/client.js repo=https://github.com/AnupJoseph/utils issue-term=pathname label=comments crossorigin=anonymous async></script><style>.utterances{max-width:unset}</style><script>function setUtterancesTheme(e){let t=document.querySelector(".utterances iframe");t&&t.contentWindow.postMessage({type:"set-theme",theme:`github-${e}`},"https://utteranc.es")}addEventListener("message",e=>{if(e.origin!=="https://utteranc.es")return;setUtterancesTheme(document.documentElement.dataset.scheme)}),window.addEventListener("onColorSchemeChange",e=>{setUtterancesTheme(e.detail)})</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2024 Utils</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.16.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/utils/ts/main.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

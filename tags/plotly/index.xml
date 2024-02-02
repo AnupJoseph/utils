@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>plotly on Utils</title><link>https://anupjoseph.github.io/utils/tags/plotly/</link><description>Recent content in plotly on Utils</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><atom:link href="https://anupjoseph.github.io/utils/tags/plotly/index.xml" rel="self" type="application/rss+xml"/><item><title>Bumpchart with Python and plotly</title><link>https://anupjoseph.github.io/utils/p/bumpchart-python/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/bumpchart-python/</guid><description>&lt;img src="https://anupjoseph.github.io/utils/p/bumpchart-python/cover.png" alt="Featured image of post Bumpchart with Python and plotly" />&lt;p>I looked far and wide to find a good way to build a bump chart like the one in this &lt;a class="link" href="https://twitter.com/steodosescu/status/1549065989630832642" target="_blank" rel="noopener"
+>tweet&lt;/a> in Python. After finding basically nothing except for a page in &lt;a class="link" href="https://altair-viz.github.io/gallery/bump_chart.html" target="_blank" rel="noopener"
+>Altair docs&lt;/a> about Bump Charts, I (reluctantly) decided to roll my own version of the tweet. While it did not reach the expected highs of that tweet, I am pleased with the end result and its easily modifiable and extensible.&lt;/p>
+&lt;p>The data I am using is the flights arrival and departure info available &lt;a class="link" href="https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-07-12/flights.csv" target="_blank" rel="noopener"
+>here&lt;/a>. Replace this with your own when working on your data.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-py" data-lang="py">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Lets get all the imports in place&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pandas&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">pd&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">plotly.graph_objects&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">go&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">numpy&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">np&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-py" data-lang="py">&lt;span class="line">&lt;span class="cl">&lt;span class="n">data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">read_csv&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;flights.csv&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">data&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">head&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://anupjoseph.github.io/utils/utils/p/bumpchart-python/head_output.jpg"
+width="1362"
+height="442"
+srcset="https://anupjoseph.github.io/utils/utils/p/bumpchart-python/head_output_hu927eef378747dce186388205ed268b7c_55610_480x0_resize_q75_box.jpg 480w, https://anupjoseph.github.io/utils/utils/p/bumpchart-python/head_output_hu927eef378747dce186388205ed268b7c_55610_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+alt="dataset"
+class="gallery-image"
+data-flex-grow="308"
+data-flex-basis="739px"
+>&lt;/p>
+&lt;p>Here we are trying to arange countries by the amount of air traffic across years. Let&amp;rsquo;s build that information by grouping by the &lt;code>STATE_NAME,YEAR&lt;/code> variables and then adding total flight count(&lt;code>FLT_TOT_1&lt;/code>).&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-py" data-lang="py">&lt;span class="line">&lt;span class="cl">&lt;span class="n">country_flights_by_year&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">data&lt;/span>&lt;span class="p">[[&lt;/span>&lt;span class="s2">&amp;#34;YEAR&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;STATE_NAME&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;FLT_TOT_1&amp;#34;&lt;/span>&lt;span class="p">]]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">.&lt;/span>&lt;span class="n">groupby&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">by&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;YEAR&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;STATE_NAME&amp;#34;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">.&lt;/span>&lt;span class="n">sum&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">.&lt;/span>&lt;span class="n">reset_index&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">country_flights_by_year&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://anupjoseph.github.io/utils/utils/p/bumpchart-python/country_flights_by_year.jpg"
+width="540"
+height="550"
+srcset="https://anupjoseph.github.io/utils/utils/p/bumpchart-python/country_flights_by_year_hub5b0c587a2632ef5e026650f4879ce64_35293_480x0_resize_q75_box.jpg 480w, https://anupjoseph.github.io/utils/utils/p/bumpchart-python/country_flights_by_year_hub5b0c587a2632ef5e026650f4879ce64_35293_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+alt="country_flights_by_year"
+class="gallery-image"
+data-flex-grow="98"
+data-flex-basis="235px"
+>&lt;/p>
+&lt;p>I am going to build an extra column to use as proxy for rank and the X-axis of the chart as well&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">x&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">country_rank&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">YEAR&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">unique&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">country_dict&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">country_rank&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;POSITION&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">stack&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">13&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">_&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">6&lt;/span>&lt;span class="p">)],&lt;/span> &lt;span class="n">axis&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ravel&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The next bit here is important. A bumpchart essentially represents the position of each category w.r.t. to others. To do that obviously its needs the said position. We build the same in this section. This code will differ for each chart. Its possible to generalize this but I am not going to do that here.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="n">grp_name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">grp&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">country_rank&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">groupby&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;STATE_NAME&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">country_position&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="mi">13&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">grp&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">POSITION&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">country_position&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">country_dict&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">grp_name&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">country_position&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">country_dict&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;Poland&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">insert&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">country_dict&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;Portugal&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">insert&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>And finally we use this &lt;code>dict&lt;/code> to plot the chart.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-py" data-lang="py">&lt;span class="line">&lt;span class="cl">&lt;span class="n">fig&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">go&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Figure&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="n">country&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">position&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">country_dict&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">items&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_trace&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">go&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Scatter&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">x&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">position&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">line_shape&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;spline&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">country&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">update_traces&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hoverinfo&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;text+name&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;lines+markers&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">update_layout&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">showlegend&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">update_xaxes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">showgrid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">zeroline&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">update_yaxes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">showgrid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">zeroline&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">show&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>And here&amp;rsquo;s the chart!
+&lt;img src="https://anupjoseph.github.io/utils/utils/p/bumpchart-python/cover.png"
+width="901"
+height="450"
+srcset="https://anupjoseph.github.io/utils/utils/p/bumpchart-python/cover_hu785a14dac6c3e02def33fa2fd5c1ec0f_47184_480x0_resize_box_3.png 480w, https://anupjoseph.github.io/utils/utils/p/bumpchart-python/cover_hu785a14dac6c3e02def33fa2fd5c1ec0f_47184_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Bump Charts"
+class="gallery-image"
+data-flex-grow="200"
+data-flex-basis="480px"
+>&lt;/p>
+&lt;p>I think this looks good for now! Its a clean chart that we can extend for our uses later!&lt;/p>
+&lt;blockquote>
+&lt;p>Thanks to &lt;a class="link" href="https://twitter.com/steodosescu" target="_blank" rel="noopener"
+>Stephen Teodosescu&lt;/a> for this awesome chart.&lt;/p>
+&lt;/blockquote></description></item><item><title>Countplot in Plotly</title><link>https://anupjoseph.github.io/utils/p/count-plot-plotly/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/count-plot-plotly/</guid><description>&lt;img src="https://anupjoseph.github.io/utils/p/count-plot-plotly/cover.png" alt="Featured image of post Countplot in Plotly" />&lt;p>This is a way to do replicate seaborn &lt;code>countplot&lt;/code> functionality in Plotly.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">plotly.express&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">px&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">countplot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">dataset&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">column&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">log_y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fig&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">px&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">bar&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">x&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">dataset&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">column&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">value_counts&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">index&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">dataset&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">column&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">value_counts&lt;/span>&lt;span class="p">(),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">log_y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">log_y&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">xtickval&lt;/span>&lt;span class="p">[:&lt;/span>&lt;span class="mi">40&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">...&amp;#34;&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">xtickval&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">30&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="n">xtickval&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">xtickval&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">x&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">fig&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>This is the all the code you need for countplot&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">countplot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">dataset&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">column&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;OCC_TITLE&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">show&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://anupjoseph.github.io/utils/utils/p/count-plot-plotly/cover.png"
+width="953"
+height="450"
+srcset="https://anupjoseph.github.io/utils/utils/p/count-plot-plotly/cover_hu0d9d92d29d2547752bcb7f2fb2a52b4a_27518_480x0_resize_box_3.png 480w, https://anupjoseph.github.io/utils/utils/p/count-plot-plotly/cover_hu0d9d92d29d2547752bcb7f2fb2a52b4a_27518_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="&amp;ldquo;Countplot&amp;rdquo;"
+class="gallery-image"
+data-flex-grow="211"
+data-flex-basis="508px"
+>&lt;/p></description></item></channel></rss>

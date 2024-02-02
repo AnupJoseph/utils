@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Web-Scraping on Utils</title><link>https://anupjoseph.github.io/utils/categories/web-scraping/</link><description>Recent content in Web-Scraping on Utils</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><atom:link href="https://anupjoseph.github.io/utils/categories/web-scraping/index.xml" rel="self" type="application/rss+xml"/><item><title>Extract Table from Webpage</title><link>https://anupjoseph.github.io/utils/p/extract_table/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/extract_table/</guid><description>&lt;img src="https://anupjoseph.github.io/utils/p/extract_table/table.png" alt="Featured image of post Extract Table from Webpage" />&lt;p>I wanted to quickly extract a table from a webpage. And I didn&amp;rsquo;t want to go through the using &lt;code>beautiful_soup&lt;/code> or &lt;code>scrapy&lt;/code> to do that. While I was looking for something simple I found a gem of a function to do that.&lt;/p>
+&lt;p>I want to extract the list of hellos in different languages from this &lt;a class="link" href="https://www.berlitz.com/blog/hello-different-languages" target="_blank" rel="noopener"
+>page&lt;/a>. Let&amp;rsquo;s go ahead and import pandas.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-py" data-lang="py">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pandas&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">pd&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>We can now use the &lt;code>read_html&lt;/code> function from pandas like so&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">tables&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">read_csv&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;https://www.berlitz.com/blog/hello-different-languages&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The languages table is the first table in the page. So we can index it&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-py" data-lang="py">&lt;span class="line">&lt;span class="cl">&lt;span class="n">tables&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://anupjoseph.github.io/utils/utils/p/extract_table/extracted_table.png"
+width="775"
+height="622"
+srcset="https://anupjoseph.github.io/utils/utils/p/extract_table/extracted_table_hua5e3d7f4df1a5ba418fd5512780464fb_36766_480x0_resize_box_3.png 480w, https://anupjoseph.github.io/utils/utils/p/extract_table/extracted_table_hua5e3d7f4df1a5ba418fd5512780464fb_36766_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Extacted table"
+class="gallery-image"
+data-flex-grow="124"
+data-flex-basis="299px"
+>&lt;/p>
+&lt;p>And that&amp;rsquo;s it. A really quick way to extract something that&amp;rsquo;s actually not quite this easy otherwise.&lt;/p></description></item></channel></rss>

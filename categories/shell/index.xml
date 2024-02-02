@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Shell on Utils</title><link>https://anupjoseph.github.io/utils/categories/shell/</link><description>Recent content in Shell on Utils</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><atom:link href="https://anupjoseph.github.io/utils/categories/shell/index.xml" rel="self" type="application/rss+xml"/><item><title>tricks.sh</title><link>https://anupjoseph.github.io/utils/p/tricks-sh/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/tricks-sh/</guid><description>&lt;h1 id="table-of-contents">Table of Contents&lt;/h1>
+&lt;ol>
+&lt;li>&lt;a class="link" href="#org4f2342b" >Shell tricks&lt;/a>
+&lt;ol>
+&lt;li>&lt;a class="link" href="#switch-to-previous-directory" >Switch to previous directory&lt;/a>
+&lt;ol>
+&lt;li>&lt;a class="link" href="#git" >git&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>&lt;a class="link" href="#org6b00f32" >master&lt;/a>
+1. &lt;a class="link" href="#cd" >cd&lt;/a>
+&lt;ol>
+&lt;li>&lt;a class="link" href="#get-global-ip" >Get global ip&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#simple-commands" >Simple commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#loop" >Loop&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#loop-with-specified-increment-each-iteration" >Loop with specified increment each iteration&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#sequences-of-letters-or-numbers" >Sequences of letters or numbers&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#reuse-arguments" >Reuse arguments&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#reuse-commands" >Reuse commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#compare-output-of-two-commands" >Compare output of two commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#fix-last-command" >Fix last command&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#accept-interactive-commands" >Accept interactive commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#last-exit-code" >Last exit code&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#easy-backup" >Easy backup&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#print-to-stderr" >Print to stderr&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#debugging" >Debugging&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#useful-readline-tricks" >Useful &lt;code>readline&lt;/code> tricks&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#repeat-command" >Repeat command&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#zipping-and-unzip" >Zipping and Unzip&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ol>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h1 id="shell-tricks">Shell tricks&lt;/h1>
+&lt;ul>
+&lt;li>&lt;a class="link" href="#switch-to-previous-directory" >Switch to previous directory&lt;/a>
+&lt;ul>
+&lt;li>&lt;a class="link" href="#git" >git&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#cd" >cd&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a class="link" href="#get-global-ip" >Get global ip&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#simple-commands" >Simple commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#loop" >Loop&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#loop-with-specified-increment-each-iteration" >Loop with specified increment each iteration&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#sequences-of-letters-or-numbers" >Sequences of letters or numbers&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#reuse-arguments" >Reuse arguments&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#reuse-commands" >Reuse commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#compare-output-of-two-commands" >Compare output of two commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#fix-last-command" >Fix last command&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#accept-interactive-commands" >Accept interactive commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#last-exit-code" >Last exit code&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#easy-backup" >Easy backup&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#print-to-stderr" >Print to stderr&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#debugging" >Debugging&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#useful-readline-tricks" >Useful &lt;code>readline&lt;/code> tricks&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#repeat-command" >Repeat command&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#zipping-and-unzip" >Zipping and Unzip&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="switch-to-previous-directory">Switch to previous directory&lt;/h2>
+&lt;p>Switch between the current and previous branch / directory.&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h3 id="git">git&lt;/h3>
+&lt;p>#+begin&lt;!-- raw HTML omitted -->src&lt;!-- raw HTML omitted --> sh
+$ git branch&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h1 id="master">master&lt;/h1>
+&lt;p>development&lt;/p>
+&lt;p>$ git checkout development
+Switched to branch ’development’
+$ git checkout - # Switch to previous
+Switched to branch ’master’
+$ git checkout -
+Switched to branch ’development’
+#+end&lt;!-- raw HTML omitted -->src&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h3 id="cd">cd&lt;/h3>
+&lt;pre>&lt;code>$ pwd
+/
+$ cd /tmp
+$ cd - # Switch to previous
+/
+$ cd -
+/tmp
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="get-global-ip">Get global ip&lt;/h2>
+&lt;pre>&lt;code>$ curl ifconfig.co # IPv4
+50.110.14.21
+$ curl -6 ifconfig.co # IPv6
+2010:3f3f:113f:0:ea57:4497:7291:e422
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="simple-commands">Simple commands&lt;/h2>
+&lt;p>Create a script which calls functions by its` first argument. This is
+very useful to create simple scripts which could be a wrapper for other
+commands.&lt;/p>
+&lt;pre>&lt;code>#!/usr/bin/env bash
+function do_this () { echo &amp;quot;call do_this function&amp;quot;; }
+function do_sth() { echo &amp;quot;call do_sth function&amp;quot; }
+case &amp;quot;$1&amp;quot; in
+do_this|do_sth) &amp;quot;$1&amp;quot; ;;
+esac
+&lt;/code>&lt;/pre>
+&lt;p>Execute it:&lt;/p>
+&lt;pre>&lt;code>$ ./simple-commands.sh do_this
+call do_this function
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="loop">Loop&lt;/h2>
+&lt;p>Write simple one liner loops if you need to do some batch tasks.&lt;/p>
+&lt;pre>&lt;code>$ for i in {1..10}; do echo &amp;quot;$i&amp;quot;; done
+# List disk usage by directories
+$ for file in */ .*/ ; do du -sh $file; done
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="loop-with-specified-increment-each-iteration">Loop with specified increment each iteration&lt;/h2>
+&lt;pre>&lt;code>for i in {1..100..2}; do echo $i; done
+1
+3
+5
+7
+...
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="sequences-of-letters-or-numbers">Sequences of letters or numbers&lt;/h2>
+&lt;p>Brace expansion is great for lots of things.&lt;/p>
+&lt;pre>&lt;code>$ touch file{a..c}
+$ ls
+$ command ls
+filea fileb filec
+$ touch file-{1..15}
+$ ls
+file-1 file-10 file-11 file-12 file-13 file-14 file-15 file-2 file-3 file-4 file-5 file-6 file-7 file-8 file-9
+$ ls file-{9..12}
+file-10 file-11 file-12 file-9
+$ printf &amp;quot;%s\n&amp;quot; file-{a..c}{1..3}
+file-a1
+file-a2
+file-a3
+file-b1
+file-b2
+file-b3
+file-c1
+file-c2
+file-c3
+&lt;/code>&lt;/pre>
+&lt;p>(If you give &lt;code>printf&lt;/code> more arguments than it expects, it automatically
+loops.)&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="reuse-arguments">Reuse arguments&lt;/h2>
+&lt;pre>&lt;code>$ ls /tmp
+some_file.txt some_archive.tar.gz
+$ cd !$
+/tmp
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="reuse-commands">Reuse commands&lt;/h2>
+&lt;pre>&lt;code>$ echo &amp;quot;reuse me&amp;quot;
+reuse me
+$ !!
+echo &amp;quot;reuse me&amp;quot;
+reuse me
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="compare-output-of-two-commands">Compare output of two commands&lt;/h2>
+&lt;pre>&lt;code>diff &amp;lt;(echo &amp;quot;1 2 4&amp;quot;) &amp;lt;(echo &amp;quot;1 2 3 4&amp;quot;)
+1c1
+&amp;lt; 1 2 4
+---
+&amp;gt; 1 2 3 4
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="fix-last-command">Fix last command&lt;/h2>
+&lt;pre>&lt;code>$ ehco foo bar bar
+bash: ehco: command not found
+$ ^ehco^echo
+foo bar baz
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="accept-interactive-commands">Accept interactive commands&lt;/h2>
+&lt;pre>&lt;code>$ yes | ./interactive-command.sh
+Are you sure (y/n)
+Accepted
+yes: standard output: Broken pipe
+&lt;/code>&lt;/pre>
+&lt;p>The error message is printed because &lt;code>yes&lt;/code> gets killed by &lt;code>SIGPIPE&lt;/code>
+signal. This happens if the pipe to &lt;code>./interactive-command.sh&lt;/code> gets
+closed but &lt;code>yes&lt;/code> still wants to write into it.&lt;/p>
+&lt;p>Ignore error message:&lt;/p>
+&lt;p>&lt;code>$ yes 2&amp;gt;/dev/null | ./interactive-command.sh&lt;/code>&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="last-exit-code">Last exit code&lt;/h2>
+&lt;pre>&lt;code>$ ls /tmp
+some_file.txt
+$ echo $?
+0
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="easy-backup">Easy backup&lt;/h2>
+&lt;pre>&lt;code>$ cp file.txt{,.bak}
+$ ls -1
+file.txt
+file.txt.bak
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="print-to-stderr">Print to stderr&lt;/h2>
+&lt;pre>&lt;code>$ &amp;gt;&amp;amp;2 echo hello
+hello
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="debugging">Debugging&lt;/h2>
+&lt;p>Add &lt;code>-xv&lt;/code> to your bash scripts, i.e.:&lt;/p>
+&lt;pre>&lt;code>/usr/bin/env bash
+set -xv
+&lt;/code>&lt;/pre>
+&lt;p>or &lt;code>/bin/bash -xv script.sh&lt;/code>&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="useful-readline-tricks">Useful &lt;code>readline&lt;/code> tricks&lt;/h2>
+&lt;p>If you use the standard &lt;code>bash&lt;/code> &lt;code>readline&lt;/code> bindings.&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>C-a&lt;/code> (aka &lt;code>CTRL+A&lt;/code>) move cursor to beginning of line&lt;/li>
+&lt;li>&lt;code>C-e&lt;/code> (aka &lt;code>CTRL+E&lt;/code>) move cursor to end of line&lt;/li>
+&lt;li>&lt;code>M-.&lt;/code> (aka &lt;code>ALT+.&lt;/code>) insert last argument of previous command (like
+&lt;code>!$&lt;/code>, but you can edit it)&lt;/li>
+&lt;/ul>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="repeat-command">Repeat command&lt;/h2>
+&lt;p>Execute a command every two seconds and monitor its` output. This is
+especially useful for waiting until a deployment or infrastructure
+provisioning is completed, i.e. on aws.&lt;/p>
+&lt;p>&lt;code>watch -n2 echo hello&lt;/code> ` ## Substrings&lt;/p>
+&lt;pre>&lt;code>$ a=&amp;quot;apple orange&amp;quot;
+$ echo ${a#* }
+orange
+$ echo ${a#*p}
+ple orange
+$ echo ${a##*p}
+le orange
+$ echo ${a% *}
+apple
+$ echo ${a%p*}
+ap
+$ echo ${a%%p*}
+a
+&lt;/code>&lt;/pre>
+&lt;p>The # for finding first occurence from the start and % for the first
+occurence from the end. * for matching any pattern. For greedy matching
+## and %%.&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="zipping-and-unzip">Zipping and Unzip&lt;/h2>
+&lt;p>To zip a folder with certain file types excluded&lt;/p>
+&lt;pre>&lt;code>zip -x {file_types} -r archive.zip {folder}&lt;/code>&lt;/pre></description></item></channel></rss>

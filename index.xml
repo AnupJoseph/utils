@@ -1,0 +1,821 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Utils</title><link>https://anupjoseph.github.io/utils/</link><description>Recent content on Utils</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 06 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://anupjoseph.github.io/utils/index.xml" rel="self" type="application/rss+xml"/><item><title>Archives</title><link>https://anupjoseph.github.io/utils/archives/</link><pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/archives/</guid><description/></item><item><title>BigQuery Levenshtien Distance</title><link>https://anupjoseph.github.io/utils/p/edit-distance-bigquery/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/edit-distance-bigquery/</guid><description>&lt;img src="https://anupjoseph.github.io/utils/p/edit-distance-bigquery/cover.webp" alt="Featured image of post BigQuery Levenshtien Distance" />&lt;p>Edit distance is essentially a metric which is about comparing the number of changes required to turn one string into another.&lt;/p>
+&lt;p>&amp;ldquo;Whisky&amp;rdquo; — &amp;ldquo;Whiskey&amp;rdquo;: Levenshtein Distance, 1. An ‘e’ is added.&lt;/p>
+&lt;p>Using this function on a large text column often tens to be pretty slow. So we write a UDF(user-defined-function) in Javascript and use BigQuery to execute this Javascript function over the whole column. (The syntax highlighting breaks badly cause this is a weird combination of SQL and JS.)&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="line">&lt;span class="cl">&lt;span class="k">CREATE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">OR&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">REPLACE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">FUNCTION&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">validation_data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">LevenshteinDistance&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">in_a&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">in_b&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">RETURNS&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">INT64&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">LANGUAGE&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">js&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">AS&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">/*
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> * Data Quality Function - Fuzzy Matching
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> * dq_fm_LevenshteinDistance
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> * Based off of https://gist.github.com/andrei-m/982927
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> * input: Two strings to compare the edit distance of.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> * returns: Integer of the edit distance.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> */
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">var a = in_a.toLowerCase();
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">var b = in_b.toLowerCase();
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">if (a.length == 0) return b.length;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">if (b.length == 0) return a.length;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">var matrix = [];
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">// increment along the first column of each row
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">var i;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">for (i = 0; i &amp;lt;= b.length; i++) {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> matrix[i] = [i];
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">// increment each column in the first row
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">var j;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">for (j = 0; j &amp;lt;= a.length; j++) {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> matrix[0][j] = j;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">// Fill in the rest of the matrix
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">for (i = 1; i &amp;lt;= b.length; i++) {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> for (j = 1; j &amp;lt;= a.length; j++) {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> if (b.charAt(i - 1) == a.charAt(j - 1)) {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> matrix[i][j] = matrix[i - 1][j - 1];
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> } else {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> matrix[i][j] =
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> Math.min(matrix[i - 1][j - 1] + 1, // substitution
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> Math.min(matrix[i][j - 1] + 1, // insertion
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> matrix[i - 1][j] + 1)); // deletion
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> }
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">return matrix[b.length][a.length];
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>This function was creatively extracted from a blog &lt;a class="link" href="https://medium.com/google-cloud/a-journey-into-bigquery-fuzzy-matching-2-of-1-more-soundex-and-levenshtein-distance-e64b25ea4ec7" target="_blank" rel="noopener"
+>here&lt;/a>. Please read it to get more info on how this exactly works&lt;/p></description></item><item><title>Bumpchart with Python and plotly</title><link>https://anupjoseph.github.io/utils/p/bumpchart-python/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/bumpchart-python/</guid><description>&lt;img src="https://anupjoseph.github.io/utils/p/bumpchart-python/cover.png" alt="Featured image of post Bumpchart with Python and plotly" />&lt;p>I looked far and wide to find a good way to build a bump chart like the one in this &lt;a class="link" href="https://twitter.com/steodosescu/status/1549065989630832642" target="_blank" rel="noopener"
+>tweet&lt;/a> in Python. After finding basically nothing except for a page in &lt;a class="link" href="https://altair-viz.github.io/gallery/bump_chart.html" target="_blank" rel="noopener"
+>Altair docs&lt;/a> about Bump Charts, I (reluctantly) decided to roll my own version of the tweet. While it did not reach the expected highs of that tweet, I am pleased with the end result and its easily modifiable and extensible.&lt;/p>
+&lt;p>The data I am using is the flights arrival and departure info available &lt;a class="link" href="https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-07-12/flights.csv" target="_blank" rel="noopener"
+>here&lt;/a>. Replace this with your own when working on your data.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-py" data-lang="py">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Lets get all the imports in place&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pandas&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">pd&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">plotly.graph_objects&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">go&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">numpy&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">np&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-py" data-lang="py">&lt;span class="line">&lt;span class="cl">&lt;span class="n">data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">read_csv&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;flights.csv&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">data&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">head&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://anupjoseph.github.io/utils/utils/p/bumpchart-python/head_output.jpg"
+width="1362"
+height="442"
+srcset="https://anupjoseph.github.io/utils/utils/p/bumpchart-python/head_output_hu927eef378747dce186388205ed268b7c_55610_480x0_resize_q75_box.jpg 480w, https://anupjoseph.github.io/utils/utils/p/bumpchart-python/head_output_hu927eef378747dce186388205ed268b7c_55610_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+alt="dataset"
+class="gallery-image"
+data-flex-grow="308"
+data-flex-basis="739px"
+>&lt;/p>
+&lt;p>Here we are trying to arange countries by the amount of air traffic across years. Let&amp;rsquo;s build that information by grouping by the &lt;code>STATE_NAME,YEAR&lt;/code> variables and then adding total flight count(&lt;code>FLT_TOT_1&lt;/code>).&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-py" data-lang="py">&lt;span class="line">&lt;span class="cl">&lt;span class="n">country_flights_by_year&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">data&lt;/span>&lt;span class="p">[[&lt;/span>&lt;span class="s2">&amp;#34;YEAR&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;STATE_NAME&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;FLT_TOT_1&amp;#34;&lt;/span>&lt;span class="p">]]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">.&lt;/span>&lt;span class="n">groupby&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">by&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;YEAR&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;STATE_NAME&amp;#34;&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">.&lt;/span>&lt;span class="n">sum&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">.&lt;/span>&lt;span class="n">reset_index&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">country_flights_by_year&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://anupjoseph.github.io/utils/utils/p/bumpchart-python/country_flights_by_year.jpg"
+width="540"
+height="550"
+srcset="https://anupjoseph.github.io/utils/utils/p/bumpchart-python/country_flights_by_year_hub5b0c587a2632ef5e026650f4879ce64_35293_480x0_resize_q75_box.jpg 480w, https://anupjoseph.github.io/utils/utils/p/bumpchart-python/country_flights_by_year_hub5b0c587a2632ef5e026650f4879ce64_35293_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+alt="country_flights_by_year"
+class="gallery-image"
+data-flex-grow="98"
+data-flex-basis="235px"
+>&lt;/p>
+&lt;p>I am going to build an extra column to use as proxy for rank and the X-axis of the chart as well&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">x&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">country_rank&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">YEAR&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">unique&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">country_dict&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">country_rank&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;POSITION&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">stack&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">13&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">_&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">6&lt;/span>&lt;span class="p">)],&lt;/span> &lt;span class="n">axis&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ravel&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The next bit here is important. A bumpchart essentially represents the position of each category w.r.t. to others. To do that obviously its needs the said position. We build the same in this section. This code will differ for each chart. Its possible to generalize this but I am not going to do that here.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="n">grp_name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">grp&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">country_rank&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">groupby&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;STATE_NAME&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">country_position&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="mi">13&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">grp&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">POSITION&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">country_position&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">country_dict&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">grp_name&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">country_position&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">country_dict&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;Poland&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">insert&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">country_dict&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;Portugal&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">insert&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>And finally we use this &lt;code>dict&lt;/code> to plot the chart.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-py" data-lang="py">&lt;span class="line">&lt;span class="cl">&lt;span class="n">fig&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">go&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Figure&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="n">country&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">position&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">country_dict&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">items&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_trace&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">go&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Scatter&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">x&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">position&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">line_shape&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;spline&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">country&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">update_traces&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hoverinfo&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;text+name&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;lines+markers&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">update_layout&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">showlegend&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">update_xaxes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">showgrid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">zeroline&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">update_yaxes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">showgrid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">zeroline&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">show&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>And here&amp;rsquo;s the chart!
+&lt;img src="https://anupjoseph.github.io/utils/utils/p/bumpchart-python/cover.png"
+width="901"
+height="450"
+srcset="https://anupjoseph.github.io/utils/utils/p/bumpchart-python/cover_hu785a14dac6c3e02def33fa2fd5c1ec0f_47184_480x0_resize_box_3.png 480w, https://anupjoseph.github.io/utils/utils/p/bumpchart-python/cover_hu785a14dac6c3e02def33fa2fd5c1ec0f_47184_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Bump Charts"
+class="gallery-image"
+data-flex-grow="200"
+data-flex-basis="480px"
+>&lt;/p>
+&lt;p>I think this looks good for now! Its a clean chart that we can extend for our uses later!&lt;/p>
+&lt;blockquote>
+&lt;p>Thanks to &lt;a class="link" href="https://twitter.com/steodosescu" target="_blank" rel="noopener"
+>Stephen Teodosescu&lt;/a> for this awesome chart.&lt;/p>
+&lt;/blockquote></description></item><item><title>Countplot in Plotly</title><link>https://anupjoseph.github.io/utils/p/count-plot-plotly/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/count-plot-plotly/</guid><description>&lt;img src="https://anupjoseph.github.io/utils/p/count-plot-plotly/cover.png" alt="Featured image of post Countplot in Plotly" />&lt;p>This is a way to do replicate seaborn &lt;code>countplot&lt;/code> functionality in Plotly.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">plotly.express&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">px&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">countplot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">dataset&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">column&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">log_y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fig&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">px&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">bar&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">x&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">dataset&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">column&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">value_counts&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">index&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">dataset&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">column&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">value_counts&lt;/span>&lt;span class="p">(),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">log_y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">log_y&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">xtickval&lt;/span>&lt;span class="p">[:&lt;/span>&lt;span class="mi">40&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">...&amp;#34;&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">xtickval&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">30&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="n">xtickval&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">xtickval&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">fig&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">x&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">fig&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>This is the all the code you need for countplot&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">countplot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">dataset&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">column&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;OCC_TITLE&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">show&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://anupjoseph.github.io/utils/utils/p/count-plot-plotly/cover.png"
+width="953"
+height="450"
+srcset="https://anupjoseph.github.io/utils/utils/p/count-plot-plotly/cover_hu0d9d92d29d2547752bcb7f2fb2a52b4a_27518_480x0_resize_box_3.png 480w, https://anupjoseph.github.io/utils/utils/p/count-plot-plotly/cover_hu0d9d92d29d2547752bcb7f2fb2a52b4a_27518_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="&amp;ldquo;Countplot&amp;rdquo;"
+class="gallery-image"
+data-flex-grow="211"
+data-flex-basis="508px"
+>&lt;/p></description></item><item><title>Extract Table from Webpage</title><link>https://anupjoseph.github.io/utils/p/extract_table/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/extract_table/</guid><description>&lt;img src="https://anupjoseph.github.io/utils/p/extract_table/table.png" alt="Featured image of post Extract Table from Webpage" />&lt;p>I wanted to quickly extract a table from a webpage. And I didn&amp;rsquo;t want to go through the using &lt;code>beautiful_soup&lt;/code> or &lt;code>scrapy&lt;/code> to do that. While I was looking for something simple I found a gem of a function to do that.&lt;/p>
+&lt;p>I want to extract the list of hellos in different languages from this &lt;a class="link" href="https://www.berlitz.com/blog/hello-different-languages" target="_blank" rel="noopener"
+>page&lt;/a>. Let&amp;rsquo;s go ahead and import pandas.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-py" data-lang="py">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">pandas&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">pd&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>We can now use the &lt;code>read_html&lt;/code> function from pandas like so&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">tables&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">read_csv&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;https://www.berlitz.com/blog/hello-different-languages&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The languages table is the first table in the page. So we can index it&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-py" data-lang="py">&lt;span class="line">&lt;span class="cl">&lt;span class="n">tables&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://anupjoseph.github.io/utils/utils/p/extract_table/extracted_table.png"
+width="775"
+height="622"
+srcset="https://anupjoseph.github.io/utils/utils/p/extract_table/extracted_table_hua5e3d7f4df1a5ba418fd5512780464fb_36766_480x0_resize_box_3.png 480w, https://anupjoseph.github.io/utils/utils/p/extract_table/extracted_table_hua5e3d7f4df1a5ba418fd5512780464fb_36766_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Extacted table"
+class="gallery-image"
+data-flex-grow="124"
+data-flex-basis="299px"
+>&lt;/p>
+&lt;p>And that&amp;rsquo;s it. A really quick way to extract something that&amp;rsquo;s actually not quite this easy otherwise.&lt;/p></description></item><item><title>Groupby With Count</title><link>https://anupjoseph.github.io/utils/p/group_by_counts/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/group_by_counts/</guid><description>&lt;p>While doing any EDA or exploratory activity, you often need to groupby a certain column(s) and then do a simple count over them. This is how you&amp;rsquo;d do it in Julia&lt;/p>
+&lt;p>Let&amp;rsquo;s say you have a dataset like so&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-julia" data-lang="julia">&lt;span class="line">&lt;span class="cl">&lt;span class="k">using&lt;/span> &lt;span class="n">DataFrames&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">df&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">DataFrame&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">age_group&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s">&amp;#34;0-30&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;30-60&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;60-80&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;30-60&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;0-30&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;60-80&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">gender&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s">&amp;#34;M&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;F&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;M&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;F&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;M&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;F&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Say you want to count the population first splitting by gender and then by age. Maybe as a further input for a stacked-bar chart. First you need to do the groupby:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-julia" data-lang="julia">&lt;span class="line">&lt;span class="cl">&lt;span class="n">gdf&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">groupby&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">df&lt;/span>&lt;span class="p">,[&lt;/span>&lt;span class="ss">:gender&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="ss">:age_group&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Now that we have the individual groups we can just use the &lt;code>nrows&lt;/code> function to count the number of rows in each group.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-julia" data-lang="julia">&lt;span class="line">&lt;span class="cl">&lt;span class="n">combine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">gdf&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">nrow&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="ss">:num_rows&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://anupjoseph.github.io/utils/utils/p/group_by_counts/groupby_count.png"
+width="606"
+height="276"
+srcset="https://anupjoseph.github.io/utils/utils/p/group_by_counts/groupby_count_hu975dc27fc181be8b642668e5b335a126_4786_480x0_resize_box_3.png 480w, https://anupjoseph.github.io/utils/utils/p/group_by_counts/groupby_count_hu975dc27fc181be8b642668e5b335a126_4786_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Applying groupby to the DataFrame"
+class="gallery-image"
+data-flex-grow="219"
+data-flex-basis="526px"
+>&lt;/p></description></item><item><title>Links</title><link>https://anupjoseph.github.io/utils/links/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/links/</guid><description>&lt;p>To use this feature, add &lt;code>links&lt;/code> section to frontmatter.&lt;/p>
+&lt;p>This page&amp;rsquo;s frontmatter:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">links&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">GitHub&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">GitHub is the world&amp;#39;s largest software development platform.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">website&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">https://github.com&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">TypeScript&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">website&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">https://www.typescriptlang.org&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ts-logo-128.jpg&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>image&lt;/code> field accepts both local and external images.&lt;/p></description></item><item><title>Search</title><link>https://anupjoseph.github.io/utils/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/search/</guid><description/></item><item><title>Set up a simple logging config</title><link>https://anupjoseph.github.io/utils/p/logging_config/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/logging_config/</guid><description>&lt;p>Here&amp;rsquo;s a snippet to have a basic logging config setup in Python in a couple of lines of code.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">logging&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">logging&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">basicConfig&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">filename&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;output.log&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">filemode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;w&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">level&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">logging&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">DEBUG&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">format&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">%(asctime)s&lt;/span>&lt;span class="s2">:&lt;/span>&lt;span class="si">%(levelname)s&lt;/span>&lt;span class="s2">:&lt;/span>&lt;span class="si">%(message)s&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">datefmt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;%Y-%m-&lt;/span>&lt;span class="si">%d&lt;/span>&lt;span class="s2"> %I:%M:%S%p&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>Setting device in Torch</title><link>https://anupjoseph.github.io/utils/p/device_oneline/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/device_oneline/</guid><description>&lt;p>A simple onliner to set device in PyTorch.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">torch&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">device&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;cuda&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">torch&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">cuda&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">is_available&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span> &lt;span class="s2">&amp;#34;mps&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">torch&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">backends&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">mps&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">is_available&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span> &lt;span class="s2">&amp;#34;cpu&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;Using &lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">device&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2"> device&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>Split pdfs with python</title><link>https://anupjoseph.github.io/utils/p/split-pdfs/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/split-pdfs/</guid><description>&lt;p>This is a function using &lt;code>pypdf&lt;/code> to split a multi-page PDF into individual pages.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">os&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">pypdf&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">PdfReader&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">PdfWriter&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">split_pdfs&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">input_file_path&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">inputpdf&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">PdfReader&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">input_file_path&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;rb&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">out_paths&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="ow">not&lt;/span> &lt;span class="n">os&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">path&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exists&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;outputs&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">os&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">makedirs&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;outputs&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">page&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="nb">enumerate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">inputpdf&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">pages&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">output&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">PdfWriter&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">output&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add_page&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">page&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">out_file_path&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;outputs/&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">input_file_path&lt;/span>&lt;span class="p">[:&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">_&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">.pdf&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">with&lt;/span> &lt;span class="nb">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">out_file_path&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;wb&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">output_stream&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">output&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">output_stream&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">out_paths&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">out_file_path&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">out_paths&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>tricks.sh</title><link>https://anupjoseph.github.io/utils/p/tricks-sh/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/tricks-sh/</guid><description>&lt;h1 id="table-of-contents">Table of Contents&lt;/h1>
+&lt;ol>
+&lt;li>&lt;a class="link" href="#org4f2342b" >Shell tricks&lt;/a>
+&lt;ol>
+&lt;li>&lt;a class="link" href="#switch-to-previous-directory" >Switch to previous directory&lt;/a>
+&lt;ol>
+&lt;li>&lt;a class="link" href="#git" >git&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>&lt;a class="link" href="#org6b00f32" >master&lt;/a>
+1. &lt;a class="link" href="#cd" >cd&lt;/a>
+&lt;ol>
+&lt;li>&lt;a class="link" href="#get-global-ip" >Get global ip&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#simple-commands" >Simple commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#loop" >Loop&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#loop-with-specified-increment-each-iteration" >Loop with specified increment each iteration&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#sequences-of-letters-or-numbers" >Sequences of letters or numbers&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#reuse-arguments" >Reuse arguments&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#reuse-commands" >Reuse commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#compare-output-of-two-commands" >Compare output of two commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#fix-last-command" >Fix last command&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#accept-interactive-commands" >Accept interactive commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#last-exit-code" >Last exit code&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#easy-backup" >Easy backup&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#print-to-stderr" >Print to stderr&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#debugging" >Debugging&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#useful-readline-tricks" >Useful &lt;code>readline&lt;/code> tricks&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#repeat-command" >Repeat command&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#zipping-and-unzip" >Zipping and Unzip&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ol>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h1 id="shell-tricks">Shell tricks&lt;/h1>
+&lt;ul>
+&lt;li>&lt;a class="link" href="#switch-to-previous-directory" >Switch to previous directory&lt;/a>
+&lt;ul>
+&lt;li>&lt;a class="link" href="#git" >git&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#cd" >cd&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a class="link" href="#get-global-ip" >Get global ip&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#simple-commands" >Simple commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#loop" >Loop&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#loop-with-specified-increment-each-iteration" >Loop with specified increment each iteration&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#sequences-of-letters-or-numbers" >Sequences of letters or numbers&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#reuse-arguments" >Reuse arguments&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#reuse-commands" >Reuse commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#compare-output-of-two-commands" >Compare output of two commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#fix-last-command" >Fix last command&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#accept-interactive-commands" >Accept interactive commands&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#last-exit-code" >Last exit code&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#easy-backup" >Easy backup&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#print-to-stderr" >Print to stderr&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#debugging" >Debugging&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#useful-readline-tricks" >Useful &lt;code>readline&lt;/code> tricks&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#repeat-command" >Repeat command&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="#zipping-and-unzip" >Zipping and Unzip&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="switch-to-previous-directory">Switch to previous directory&lt;/h2>
+&lt;p>Switch between the current and previous branch / directory.&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h3 id="git">git&lt;/h3>
+&lt;p>#+begin&lt;!-- raw HTML omitted -->src&lt;!-- raw HTML omitted --> sh
+$ git branch&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h1 id="master">master&lt;/h1>
+&lt;p>development&lt;/p>
+&lt;p>$ git checkout development
+Switched to branch ’development’
+$ git checkout - # Switch to previous
+Switched to branch ’master’
+$ git checkout -
+Switched to branch ’development’
+#+end&lt;!-- raw HTML omitted -->src&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h3 id="cd">cd&lt;/h3>
+&lt;pre>&lt;code>$ pwd
+/
+$ cd /tmp
+$ cd - # Switch to previous
+/
+$ cd -
+/tmp
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="get-global-ip">Get global ip&lt;/h2>
+&lt;pre>&lt;code>$ curl ifconfig.co # IPv4
+50.110.14.21
+$ curl -6 ifconfig.co # IPv6
+2010:3f3f:113f:0:ea57:4497:7291:e422
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="simple-commands">Simple commands&lt;/h2>
+&lt;p>Create a script which calls functions by its` first argument. This is
+very useful to create simple scripts which could be a wrapper for other
+commands.&lt;/p>
+&lt;pre>&lt;code>#!/usr/bin/env bash
+function do_this () { echo &amp;quot;call do_this function&amp;quot;; }
+function do_sth() { echo &amp;quot;call do_sth function&amp;quot; }
+case &amp;quot;$1&amp;quot; in
+do_this|do_sth) &amp;quot;$1&amp;quot; ;;
+esac
+&lt;/code>&lt;/pre>
+&lt;p>Execute it:&lt;/p>
+&lt;pre>&lt;code>$ ./simple-commands.sh do_this
+call do_this function
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="loop">Loop&lt;/h2>
+&lt;p>Write simple one liner loops if you need to do some batch tasks.&lt;/p>
+&lt;pre>&lt;code>$ for i in {1..10}; do echo &amp;quot;$i&amp;quot;; done
+# List disk usage by directories
+$ for file in */ .*/ ; do du -sh $file; done
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="loop-with-specified-increment-each-iteration">Loop with specified increment each iteration&lt;/h2>
+&lt;pre>&lt;code>for i in {1..100..2}; do echo $i; done
+1
+3
+5
+7
+...
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="sequences-of-letters-or-numbers">Sequences of letters or numbers&lt;/h2>
+&lt;p>Brace expansion is great for lots of things.&lt;/p>
+&lt;pre>&lt;code>$ touch file{a..c}
+$ ls
+$ command ls
+filea fileb filec
+$ touch file-{1..15}
+$ ls
+file-1 file-10 file-11 file-12 file-13 file-14 file-15 file-2 file-3 file-4 file-5 file-6 file-7 file-8 file-9
+$ ls file-{9..12}
+file-10 file-11 file-12 file-9
+$ printf &amp;quot;%s\n&amp;quot; file-{a..c}{1..3}
+file-a1
+file-a2
+file-a3
+file-b1
+file-b2
+file-b3
+file-c1
+file-c2
+file-c3
+&lt;/code>&lt;/pre>
+&lt;p>(If you give &lt;code>printf&lt;/code> more arguments than it expects, it automatically
+loops.)&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="reuse-arguments">Reuse arguments&lt;/h2>
+&lt;pre>&lt;code>$ ls /tmp
+some_file.txt some_archive.tar.gz
+$ cd !$
+/tmp
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="reuse-commands">Reuse commands&lt;/h2>
+&lt;pre>&lt;code>$ echo &amp;quot;reuse me&amp;quot;
+reuse me
+$ !!
+echo &amp;quot;reuse me&amp;quot;
+reuse me
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="compare-output-of-two-commands">Compare output of two commands&lt;/h2>
+&lt;pre>&lt;code>diff &amp;lt;(echo &amp;quot;1 2 4&amp;quot;) &amp;lt;(echo &amp;quot;1 2 3 4&amp;quot;)
+1c1
+&amp;lt; 1 2 4
+---
+&amp;gt; 1 2 3 4
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="fix-last-command">Fix last command&lt;/h2>
+&lt;pre>&lt;code>$ ehco foo bar bar
+bash: ehco: command not found
+$ ^ehco^echo
+foo bar baz
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="accept-interactive-commands">Accept interactive commands&lt;/h2>
+&lt;pre>&lt;code>$ yes | ./interactive-command.sh
+Are you sure (y/n)
+Accepted
+yes: standard output: Broken pipe
+&lt;/code>&lt;/pre>
+&lt;p>The error message is printed because &lt;code>yes&lt;/code> gets killed by &lt;code>SIGPIPE&lt;/code>
+signal. This happens if the pipe to &lt;code>./interactive-command.sh&lt;/code> gets
+closed but &lt;code>yes&lt;/code> still wants to write into it.&lt;/p>
+&lt;p>Ignore error message:&lt;/p>
+&lt;p>&lt;code>$ yes 2&amp;gt;/dev/null | ./interactive-command.sh&lt;/code>&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="last-exit-code">Last exit code&lt;/h2>
+&lt;pre>&lt;code>$ ls /tmp
+some_file.txt
+$ echo $?
+0
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="easy-backup">Easy backup&lt;/h2>
+&lt;pre>&lt;code>$ cp file.txt{,.bak}
+$ ls -1
+file.txt
+file.txt.bak
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="print-to-stderr">Print to stderr&lt;/h2>
+&lt;pre>&lt;code>$ &amp;gt;&amp;amp;2 echo hello
+hello
+&lt;/code>&lt;/pre>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="debugging">Debugging&lt;/h2>
+&lt;p>Add &lt;code>-xv&lt;/code> to your bash scripts, i.e.:&lt;/p>
+&lt;pre>&lt;code>/usr/bin/env bash
+set -xv
+&lt;/code>&lt;/pre>
+&lt;p>or &lt;code>/bin/bash -xv script.sh&lt;/code>&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="useful-readline-tricks">Useful &lt;code>readline&lt;/code> tricks&lt;/h2>
+&lt;p>If you use the standard &lt;code>bash&lt;/code> &lt;code>readline&lt;/code> bindings.&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>C-a&lt;/code> (aka &lt;code>CTRL+A&lt;/code>) move cursor to beginning of line&lt;/li>
+&lt;li>&lt;code>C-e&lt;/code> (aka &lt;code>CTRL+E&lt;/code>) move cursor to end of line&lt;/li>
+&lt;li>&lt;code>M-.&lt;/code> (aka &lt;code>ALT+.&lt;/code>) insert last argument of previous command (like
+&lt;code>!$&lt;/code>, but you can edit it)&lt;/li>
+&lt;/ul>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="repeat-command">Repeat command&lt;/h2>
+&lt;p>Execute a command every two seconds and monitor its` output. This is
+especially useful for waiting until a deployment or infrastructure
+provisioning is completed, i.e. on aws.&lt;/p>
+&lt;p>&lt;code>watch -n2 echo hello&lt;/code> ` ## Substrings&lt;/p>
+&lt;pre>&lt;code>$ a=&amp;quot;apple orange&amp;quot;
+$ echo ${a#* }
+orange
+$ echo ${a#*p}
+ple orange
+$ echo ${a##*p}
+le orange
+$ echo ${a% *}
+apple
+$ echo ${a%p*}
+ap
+$ echo ${a%%p*}
+a
+&lt;/code>&lt;/pre>
+&lt;p>The # for finding first occurence from the start and % for the first
+occurence from the end. * for matching any pattern. For greedy matching
+## and %%.&lt;/p>
+&lt;p>&lt;!-- raw HTML omitted -->&lt;!-- raw HTML omitted -->&lt;/p>
+&lt;h2 id="zipping-and-unzip">Zipping and Unzip&lt;/h2>
+&lt;p>To zip a folder with certain file types excluded&lt;/p>
+&lt;pre>&lt;code>zip -x {file_types} -r archive.zip {folder}&lt;/code>&lt;/pre></description></item><item><title>Value Counts Julia</title><link>https://anupjoseph.github.io/utils/p/value-counts-julia/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://anupjoseph.github.io/utils/p/value-counts-julia/</guid><description>&lt;p>This is a simple way to do replicate pandas &lt;code>value_counts&lt;/code> functionality in Julia.
+For the purpose of this example I am using &lt;a class="link" href="https://www.openml.org/d/42803" target="_blank" rel="noopener"
+>Road Safety Dataset&lt;/a> in OpenML. You&amp;rsquo;ll need the &lt;code>StatsBase&lt;/code> and &lt;code>DataFrames&lt;/code> packages for the same.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-julia" data-lang="julia">&lt;span class="line">&lt;span class="cl">&lt;span class="k">using&lt;/span> &lt;span class="n">ARFFFiles&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">using&lt;/span> &lt;span class="n">DataFrames&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">using&lt;/span> &lt;span class="n">StatsBase&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c"># Lets load the dataset here as well&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">dataset&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">ARFFFiles&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">load&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">DataFrame&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;roadsafety.arff&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>To do value counts on a column use this&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-julia" data-lang="julia">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># Replace Vehicle_Type by whatever column name&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">countmap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">dataset&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Vehicle_Type&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://anupjoseph.github.io/utils/utils/p/value-counts-julia/countmap_single_column.jpg"
+width="1102"
+height="628"
+srcset="https://anupjoseph.github.io/utils/utils/p/value-counts-julia/countmap_single_column_hu43bff73e656ea6ddb91d302349d006a8_47870_480x0_resize_q75_box.jpg 480w, https://anupjoseph.github.io/utils/utils/p/value-counts-julia/countmap_single_column_hu43bff73e656ea6ddb91d302349d006a8_47870_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+alt="Applying countmap on a single column"
+class="gallery-image"
+data-flex-grow="175"
+data-flex-basis="421px"
+>&lt;/p>
+&lt;p>To apply over a full &lt;code>DataFrame&lt;/code> use&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-julia" data-lang="julia">&lt;span class="line">&lt;span class="cl">&lt;span class="n">countmap&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">eachcol&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">dataset&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Kinda hard to read output so not gonna paste here&lt;/p></description></item></channel></rss>
